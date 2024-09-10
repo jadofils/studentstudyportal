@@ -1,0 +1,140 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+/* Internal CSS styles */
+
+/* Wrapper for the card description */
+.desc {
+    position: relative;
+}
+
+/* Initially hide the description */
+.description {
+    display: none;
+    text-align: center;
+    background-color: black; /* Set background to black */
+    color: #ffffff; /* Set text color to white */
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%; /* Full width */
+    position: absolute; /* Position it absolutely to prevent affecting layout */
+    z-index: 1; /* Ensure it is above other elements */
+}
+
+/* Hover effect for the description */
+.desc:hover .description {
+    display: block;
+}
+
+/* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black background with opacity */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 5% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; /* 90% width of the viewport */
+    height: auto;
+    max-height: 80vh; /* Max height to fit within the viewport */
+    overflow: auto; /* Enable scroll if content is too large */
+    border-radius: 8px; /* Rounded corners */
+}
+
+.modal-header, .modal-footer {
+    padding: 10px;
+}
+
+.modal-header {
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-footer {
+    border-top: 1px solid #ddd;
+    text-align: right;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+</style>
+
+<section class="container mt-4">
+    <h2 class="text-center">Search books and browse your favorites</h2>
+    <p class="text-center">Enter your search query to get the results</p>
+    <form action="" method="post" class="mb-4 flex-row">
+        {% csrf_token %}
+        {{ form | crispy }}  <!-- Use form.as_p for better formatting -->
+        <input class="btn btn-danger" type="submit" value="Submit">
+    </form>
+
+    <div class="row">
+        {% if results %}
+            {% for result in results %}
+                <div class="col-md-4 mb-4">
+                    <div class="card custom-card">
+                        <img src="{{ result.thumbnail }}" class="card-img-top" alt="Thumbnail for {{ result.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ result.title }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ result.subtitle }}</h6>
+                            {% if result.description %}
+                            <div class="desc">
+                                <p>Book Description</p>
+                                <span class="description">{{ result.description }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            {% if result.categories %}
+                                <li class="list-group-item">Categories: 
+                                    {% for category in result.categories %}
+                                        {{ category }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </li>
+                            {% endif %}
+                            {% if result.count %}
+                                <li class="list-group-item">Pages: {{ result.count }}</li>
+                            {% endif %}
+                            {% if result.rating %}
+                                <li class="list-group-item">Rating: {{ result.rating }}</li>
+                            {% endif %}
+                        </ul>
+                        <div class="card-body">
+                            <a href="{{ result.preview }}" class="btn btn-primary" target="_blank">Preview</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No results found. Try a different search query.</p>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock content %}

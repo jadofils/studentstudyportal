@@ -1,0 +1,45 @@
+{% extends 'dashboard/base.html' %} 
+{% load static %} 
+{% block content %}
+
+<section class='text-center container'>
+    <h2>Search Articles in Wikipedia</h2>
+    <p>Just enter the search query to obtain the results</p><b>Enter without any space</b>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input class="btn btn-danger" type="submit" value="Submit">
+    </form><br>
+
+    {% if articles %}
+        <div class="container">
+            {% for article in articles %}
+                <div class="content-section p-0 mt-5">
+                    <a href="{{ article.link }}" class="p-0 m-0" target="_blank">
+                        <div class="custom-header">
+                            <h2>{{ article.title }}</h2>
+                            <h6>{{ article.link }}</h6>
+                        </div>
+                    </a>
+
+                    <hr class="p-0 m-0">
+                    <p class="description m-5 p-5">
+                        {{ article.details }}
+                    </p>
+
+                    {% if article.image_url %}
+                        <div class="image-container">
+                            <img src="{{ article.image_url }}" alt="{{ article.title }}" style="max-width: 90%; height: auto;">
+                        </div>
+                    {% endif %}
+
+                    <hr>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">No results found. Try a different search query.</p>
+    {% endif %}
+</section>
+
+{% endblock content %}
